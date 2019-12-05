@@ -47,7 +47,7 @@ jobs:
             cd bin/
             for i in *
               do
-                  tar czf "$i.tar" "$i"
+                  zip -r "$i.zip" "$i"
               done
             cd ../
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} bin
