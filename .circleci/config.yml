@@ -5,19 +5,26 @@ jobs:
       - image: circleci/node:12.13.0
     steps:
       - checkout
-      - run: echo "start build"
-      - run: yarn add nexe -D 
-      - run: yarn install
+      - run:
+          name: "install"
+          command: |
+            yarn add nexe -D 
+            yarn install
       - run: yarn pkg-win64
       - run: yarn pkg-win32
       - run: yarn pkg-mac
       - run: yarn pkg-linux
-      - run: echo "Pkg to binary Done"
-      - run: ls -a bin/
+      #- run:
+      #    command: |
+      #      mkdir -p /tmp/artifacts/
+      #      cp -af package.json /tmp/artifacts/
+      #      cp -af bin/* /tmp/artifacts/
       - persist_to_workspace:
           root: .
           paths: 
             - .
+      #- store_artifacts:
+      #    path: /tmp/artifacts
   publish-github-release:
     docker:
       - image: cibuilds/github:0.10
@@ -32,8 +39,18 @@ jobs:
             | head -1 \
             | awk -F: '{ print $2 }' \
             | sed 's/[",]//g')
-            echo ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./bin/
-            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./bin/
+            # echo ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} /tmp/artifacts/
+            #mkdir /tmp/release
+
+            #rm -rf /tmp/artifacts/package.json
+            #ls -a /tmp/artifacts/
+            cd bin/
+            for i in *
+              do
+                  tar czf "$i.tar" "$i"
+              done
+            cd ../
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} bin
       - run: echo "Release Done"
 
 workflows:
@@ -45,5 +62,5 @@ workflows:
           requires:
             - build
           filters:
-            tags:
-              only: /^\d+\.\d+\.\d+$/
+            branches:
+              only: master
