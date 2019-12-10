@@ -8,7 +8,7 @@ trigger:
 
 jobs:
 - job: BaseBuild
-  timeoutInMinutes: 360
+  timeoutInMinutes: 5
   strategy:
     matrix:
       linux:
@@ -37,8 +37,16 @@ jobs:
       yarn install
     displayName: 'prepare'
 
-  - script: |
-      yarn pkg-$(name)
+  - script: yarn pkg-$(name)
     displayName: 'package'
 
-  
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(Build.SourcesDirectory)/bin/$(name)/'
+      includeRootFolder: true
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/$(name).zip'
+      replaceExistingArchive: true
+
+#- job: Release
+#  dependsOn: BaseBuild
