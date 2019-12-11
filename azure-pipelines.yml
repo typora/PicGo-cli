@@ -60,6 +60,7 @@ jobs:
   steps:
   - task: GitHubRelease@1
     inputs:
+      gitHubConnection: $GITHUBCONNECT
       repositoryName: '$(Build.Repository.Name)'
       action: 'create'
       target: '$(Build.SourceVersion)'
