@@ -19,6 +19,7 @@ jobs:
         name: 'mac'
         arch: 'x64'
         imageName: 'macos-10.13'
+        extension: '.exe'
       win64:
         name: 'win64'
         arch: 'x64'
@@ -37,16 +38,26 @@ jobs:
       yarn install
     displayName: 'prepare'
 
-  - script: yarn pkg-$(name)
+  - script: nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
     displayName: 'package'
 
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: '$(Build.SourcesDirectory)/bin/$(name)/'
+      rootFolderOrFile: '$(Build.BinariesDirectory)/bin/$(name)/'
       includeRootFolder: true
       archiveType: 'zip'
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(name).zip'
       replaceExistingArchive: true
 
-#- job: Release
-#  dependsOn: BaseBuild
+- job: Release
+  dependsOn: BaseBuild
+
+  steps:
+  - task: GitHubRelease@1
+    inputs:
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'create'
+      target: '$(Build.SourceVersion)'
+      tagSource: 'gitTag'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
