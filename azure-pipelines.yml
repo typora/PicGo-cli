@@ -60,12 +60,10 @@ jobs:
   steps:
   - task: GitHubRelease@1
     inputs:
-      gitHubConnection: 'github'
+      gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
       action: 'create'
       target: '$(Build.SourceVersion)'
-      tagSource: 'userSpecifiedTag'
-      tag: 'latest'
-      title: 'latest'
+      tagSource: 'gitTag'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
