@@ -36,7 +36,7 @@ jobs:
       version: '12.x'
 
   - script: |
-      yarn global add nexe
+      npm install nexe --global
       yarn install
     displayName: 'prepare'
 
