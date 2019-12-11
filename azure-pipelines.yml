@@ -40,10 +40,10 @@ jobs:
       yarn install
     displayName: 'prepare'
 
-  - script: |
-      yarn pkg-$(name)
-      echo 'Done'
-  #- script: nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+  #- script: |
+  #    yarn pkg-$(name)
+  #    echo 'Done'
+  - script: nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
     displayName: 'package'
 
   - task: ArchiveFiles@2
