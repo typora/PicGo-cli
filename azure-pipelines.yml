@@ -64,6 +64,7 @@ jobs:
       repositoryName: '$(Build.Repository.Name)'
       action: 'create'
       target: '$(Build.SourceVersion)'
-      tagSource: 'gitTag'
+      tagSource: 'userSpecifiedTag'
+      tag: 'latest'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
