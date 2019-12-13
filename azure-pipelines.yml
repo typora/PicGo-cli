@@ -46,7 +46,7 @@ jobs:
   - script: |
       nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
-      ./$(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+      $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'package'
 
   - task: ArchiveFiles@2
