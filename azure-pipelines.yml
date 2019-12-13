@@ -60,6 +60,11 @@ jobs:
       artifact: 'picgo-cli-$(name)'
       publishLocation: 'pipeline'
 
+  - script: |
+      ls -a $(System.ArtifactsDirectory)
+      ls -a $(Build.ArtifactStagingDirectory)
+    displayName: 'check result'
+
 - job: Release
   dependsOn: BaseBuild
 
@@ -73,7 +78,7 @@ jobs:
   - script: |
       ls -a $(System.ArtifactsDirectory)
       ls -a $(Build.ArtifactStagingDirectory)
-    displayName: 'package'
+    displayName: 'check result'
 
   - task: GitHubRelease@1
     inputs:
