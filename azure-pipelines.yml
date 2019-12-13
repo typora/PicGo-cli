@@ -75,11 +75,19 @@ jobs:
       buildType: 'current'
       downloadType: 'specific'
       downloadPath: '$(System.ArtifactsDirectory)'
-  
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'current'
+      downloadType: 'specific'
+      itemPattern: '*/**.zip'
+      downloadPath: '$(System.ArtifactsDirectory)'
+
   - script: |
       ls -a $(System.ArtifactsDirectory)
+      echo '----'
       ls -a $(Build.ArtifactStagingDirectory)
-      ls -a $(Pipeline.Workspace)
+      echo '----'
+      ls -a $(System.ArtifactsDirectory)/picgo-cli-win64
     displayName: 'check result'
 
   - task: GitHubRelease@1
