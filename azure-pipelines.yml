@@ -58,7 +58,7 @@ jobs:
   - task: PublishBuildArtifacts@1
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      ArtifactName: 'picgo-cli-$(name)'
+      ArtifactName: 'picgo-cli'
       publishLocation: 'Container'
 
   - script: |
