@@ -56,8 +56,8 @@ jobs:
 
   - task: PublishPipelineArtifact@1
     inputs:
-      targetPath: '$(Pipeline.Workspace)'
-      artifact: 'picgo-cli'
+      targetPath: '$(Build.ArtifactStagingDirectory)/'
+      artifact: 'picgo-cli-$(name)'
       publishLocation: 'pipeline'
 
 - job: Release
@@ -67,8 +67,7 @@ jobs:
   - task: DownloadBuildArtifacts@0
     inputs:
       buildType: 'current'
-      downloadType: 'single'
-      artifactName: 'picgo-cli'
+      downloadType: 'specific'
       downloadPath: '$(System.ArtifactsDirectory)'
       
   - task: GitHubRelease@1
