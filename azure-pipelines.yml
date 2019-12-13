@@ -37,7 +37,7 @@ jobs:
 
   - script: |
       npm install nexe --global
-      yarn install
+      npm install
     displayName: 'prepare'
 
   #- script: |
@@ -45,6 +45,8 @@ jobs:
   #    echo 'Done'
   - script: |
       nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      ./$(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'package'
 
   - task: ArchiveFiles@2
