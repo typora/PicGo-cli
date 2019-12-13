@@ -54,10 +54,23 @@ jobs:
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(name).zip'
       replaceExistingArchive: true
 
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Pipeline.Workspace)'
+      artifact: 'picgo-cli'
+      publishLocation: 'pipeline'
+
 - job: Release
   dependsOn: BaseBuild
 
   steps:
+  - task: DownloadBuildArtifacts@0
+    inputs:
+      buildType: 'current'
+      downloadType: 'single'
+      artifactName: 'picgo-cli'
+      downloadPath: '$(System.ArtifactsDirectory)'
+      
   - task: GitHubRelease@1
     inputs:
       gitHubConnection: 'github.com_abnerlee'
