@@ -85,9 +85,7 @@ jobs:
   - script: |
       ls -a $(System.ArtifactsDirectory)
       echo '----'
-      ls -a $(Build.ArtifactStagingDirectory)
-      echo '----'
-      ls -a $(System.ArtifactsDirectory)/picgo-cli-win64
+      ls -a $(System.ArtifactsDirectory)/picgo-cli
     displayName: 'check result'
 
   - task: GitHubRelease@1
@@ -98,5 +96,6 @@ jobs:
       target: '$(Build.SourceVersion)'
       tag: 'latest'
       assetUploadMode: 'replace'
+      assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
