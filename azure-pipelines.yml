@@ -17,18 +17,21 @@ jobs:
         imageName: 'ubuntu-16.04'
         extension: ''
         cmdPrefix: ''
+        target: 'linux-x64'
       mac:
         name: 'mac'
         arch: 'x64'
         imageName: 'macos-10.13'
         extension: ''
         cmdPrefix: ''
+        target: 'mac'
       win64:
          name: 'win64'
          arch: 'x64'
          imageName: 'vs2017-win2016'
          extension: '.exe'
          cmdPrefix: 'CALL'
+         target: 'windows-x64'
 
   pool:
     vmImage: $(imageName)
@@ -41,7 +44,7 @@ jobs:
   - script: |
       $(cmdPrefix) npm install
       $(cmdPrefix) npm install nexe --global
-      $(cmdPrefix) nexe index.js --target {arch: $(arch)} --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      $(cmdPrefix) nexe index.js --target $(target) --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
       $(cmdPrefix) cp $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) $(Build.ArtifactStagingDirectory)/picgo-$(name)$(extension)
