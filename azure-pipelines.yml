@@ -49,8 +49,6 @@ jobs:
       script: |
         npm install nexe --global
         npm install
-        nexe index.js --output $(Build.BinariesDirectory)/bin/win64/picgo.exe
-
         nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
         chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
         $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
