@@ -7,6 +7,15 @@ trigger:
 - master
 
 jobs:
+- job: BuildWin
+  pool:
+    vmImage: 'vs2017-win2016'
+
+  steps:
+  - task: UseNode@1
+    inputs:
+      version: '12.x'
+
 - job: BaseBuild
   timeoutInMinutes: 5
   strategy:
@@ -22,10 +31,10 @@ jobs:
         imageName: 'macos-10.13'
         extension: ''
       win64:
-        name: 'win64'
-        arch: 'x64'
-        imageName: 'vs2017-win2016'
-        extension: '.exe'
+         name: 'win64'
+         arch: 'x64'
+         imageName: 'vs2017-win2016'
+         extension: '.exe'
 
   pool:
     vmImage: $(imageName)
@@ -35,18 +44,16 @@ jobs:
     inputs:
       version: '12.x'
 
-  - script: |
-      npm install nexe --global
-      npm install
-    displayName: 'prepare'
+  - task: CmdLine@2
+    inputs:
+      script: |
+        npm install nexe --global
+        npm install
+        nexe index.js --output $(Build.BinariesDirectory)/bin/win64/picgo.exe
 
-  #- script: |
-  #    yarn pkg-$(name)
-  #    echo 'Done'
-  - script: |
-      nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
-      chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
-      $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+        nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+        chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+        $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'package'
 
   - task: ArchiveFiles@2
