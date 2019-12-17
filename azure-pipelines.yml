@@ -36,14 +36,13 @@ jobs:
     inputs:
       version: '12.x'
 
-  - task: CmdLine@2
-    inputs:
-      script: |
-        $(cmdPrefix) npm install
-        $(cmdPrefix) npm install nexe --global
-        $(cmdPrefix) nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
-        $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
-        $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+  - script: |
+      npm install
+      npm install nexe --global
+      nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+      cp $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) $(Build.ArtifactStagingDirectory)/picgo-$(name)$(extension)
     displayName: 'package'
 
   - task: ArchiveFiles@2
