@@ -64,8 +64,12 @@ jobs:
       publishLocation: 'Container'
 
   - script: |
+      echo "ls System.ArtifactsDirectory"
       ls -a $(System.ArtifactsDirectory)
+      echo "ls System.ArtifactStagingDirectory"
       ls -a $(Build.ArtifactStagingDirectory)
+      echo "check version"
+      $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'check result'
 
 - job: Release
