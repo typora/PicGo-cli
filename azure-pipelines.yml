@@ -38,11 +38,11 @@ jobs:
 
   - script: |
       npm install
-      npm install nexe --global
-      nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
-      chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
-      $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
-      cp $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) $(Build.ArtifactStagingDirectory)/picgo-$(name)$(extension)
+      $(cmdPrefix) npm install nexe --global
+      $(cmdPrefix) nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+      $(cmdPrefix) cp $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) $(Build.ArtifactStagingDirectory)/picgo-$(name)$(extension)
     displayName: 'package'
 
   - task: ArchiveFiles@2
@@ -60,12 +60,12 @@ jobs:
       publishLocation: 'Container'
 
   - script: |
-      echo "ls System.ArtifactsDirectory"
-      ls -a $(System.ArtifactsDirectory)
-      echo "ls System.ArtifactStagingDirectory"
-      ls -a $(Build.ArtifactStagingDirectory)
-      echo "check version"
-      $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+      $(cmdPrefix) echo "ls System.ArtifactsDirectory"
+      $(cmdPrefix) ls -a $(System.ArtifactsDirectory)
+      $(cmdPrefix) echo "ls System.ArtifactStagingDirectory"
+      $(cmdPrefix) ls -a $(Build.ArtifactStagingDirectory)
+      $(cmdPrefix) echo "check version"
+      $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'check result'
 
 - job: Release
