@@ -47,7 +47,6 @@ jobs:
       $(cmdPrefix) nexe index.js --target $(target) --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
-      $(cmdPrefix) cp $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) $(Build.ArtifactStagingDirectory)/picgo-$(name)$(extension)
     displayName: 'package'
 
   - task: ArchiveFiles@2
@@ -93,10 +92,16 @@ jobs:
     inputs:
       gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
-      action: 'edit'
+      action: 'delete'
+      tag: 'latest'
+
+  - task: GitHubRelease@1
+    inputs:
+      gitHubConnection: 'github.com_abnerlee'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'create'
       target: '$(Build.SourceVersion)'
       tag: 'latest'
-      assetUploadMode: 'replace'
       assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
