@@ -39,7 +39,7 @@ jobs:
   - script: |
       npm install
       $(cmdPrefix) npm install nexe --global
-      $(cmdPrefix) nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      $(cmdPrefix) nexe index.js --target {arch: $(arch)} --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
       $(cmdPrefix) cp $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) $(Build.ArtifactStagingDirectory)/picgo-$(name)$(extension)
