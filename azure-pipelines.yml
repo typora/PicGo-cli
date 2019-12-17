@@ -47,10 +47,14 @@ jobs:
   - task: CmdLine@2
     inputs:
       script: |
-        npm install nexe --global
         npm install
+
+        npm install nexe --global
+        
         nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+
         chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+        
         $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'package'
 
