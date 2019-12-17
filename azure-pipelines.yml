@@ -26,7 +26,7 @@ jobs:
          arch: 'x64'
          imageName: 'vs2017-win2016'
          extension: '.exe'
-         cmdPrefix: 'call'
+         cmdPrefix: 'CALL'
 
   pool:
     vmImage: $(imageName)
@@ -37,7 +37,7 @@ jobs:
       version: '12.x'
 
   - script: |
-      npm install
+      $(cmdPrefix) npm install
       $(cmdPrefix) npm install nexe --global
       $(cmdPrefix) nexe index.js --target {arch: $(arch)} --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
