@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- develop
 
 jobs:
 - job: BaseBuild
@@ -32,6 +33,13 @@ jobs:
          extension: '.exe'
          cmdPrefix: 'CALL'
          target: 'windows-x64'
+      win32:
+         name: 'win32'
+         arch: 'x86'
+         imageName: 'vs2017-win2016'
+         extension: '.exe'
+         cmdPrefix: 'CALL'
+         target: 'windows-x86'
 
   pool:
     vmImage: $(imageName)
@@ -71,6 +79,14 @@ jobs:
       $(cmdPrefix) echo "check version"
       $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'check result'
+  
+
+  - task: CmdLine@2  # this step generates the output variable
+    name: GetVersion
+    inputs:
+      script: |
+        $(cmdPrefix) version = "$($(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version)"
+        $(cmdPrefix) echo "##vso[task.setvariable variable=PICGO_VERSION;]$version"
 
 - job: Release
   dependsOn: BaseBuild
@@ -89,12 +105,39 @@ jobs:
     displayName: 'check result'
 
   - task: GitHubRelease@1
+    condition: and(succeeded(), 'refs/heads/master'))
     inputs:
       gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
       action: 'edit'
       target: '$(Build.SourceVersion)'
       tag: 'latest'
+      assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
+      assetUploadMode: 'replace'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
+
+  - task: GitHubRelease@1
+    condition: and(succeeded(), 'refs/heads/master'))
+    inputs:
+      gitHubConnection: 'github.com_abnerlee'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'edit'
+      target: '$(Build.SourceVersion)'
+      tag: $[dependencies.A.outputs['GetVersion.PICGO_VERSION'] ]
+      assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
+      assetUploadMode: 'replace'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
+
+  - task: GitHubRelease@1
+    condition: and(succeeded(), 'refs/heads/develop'))
+    inputs:
+      gitHubConnection: 'github.com_abnerlee'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'edit'
+      target: '$(Build.SourceVersion)'
+      tag: 'latest-develop'
       assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
       assetUploadMode: 'replace'
       changeLogCompareToRelease: 'lastFullRelease'
