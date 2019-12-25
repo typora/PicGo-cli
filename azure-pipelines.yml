@@ -64,6 +64,8 @@ jobs:
       archiveType: 'zip'
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(name).zip'
       replaceExistingArchive: true
+  
+  - script: echo "$($(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version)" >> $(Build.ArtifactStagingDirectory)/version
 
   - task: PublishBuildArtifacts@1
     inputs:
@@ -80,7 +82,6 @@ jobs:
       $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'check result'
   
-
   - task: CmdLine@2  # this step generates the output variable
     name: GetVersion
     inputs:
@@ -100,6 +101,8 @@ jobs:
       ls -a $(System.ArtifactsDirectory)
       echo '----'
       ls -a $(System.ArtifactsDirectory)/picgo-cli
+      version=$(cat $(System.ArtifactsDirectory)/picgo-cli/version)
+      ##vso[task.setvariable variable=picgoVersion;]$version
     displayName: 'check result'
 
   - task: GitHubRelease@1
@@ -116,19 +119,7 @@ jobs:
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
 
-  - task: GitHubRelease@1
-    condition: and(succeeded(), 'refs/heads/master')
-    name: GitHubReleaseForVersion
-    inputs:
-      gitHubConnection: 'github.com_abnerlee'
-      repositoryName: '$(Build.Repository.Name)'
-      action: 'edit'
-      target: '$(Build.SourceVersion)'
-      tag: $[dependencies.A.outputs['GetVersion.PICGO_VERSION'] ]
-      assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
-      assetUploadMode: 'replace'
-      changeLogCompareToRelease: 'lastFullRelease'
-      changeLogType: 'commitBased'
+  - script: echo "$picgoVersion"
 
   - task: GitHubRelease@1
     name: GitHubReleaseForDevelopLatest
