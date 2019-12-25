@@ -105,7 +105,7 @@ jobs:
     displayName: 'check result'
 
   - task: GitHubRelease@1
-    condition: and(succeeded(), 'refs/heads/master'))
+    condition: and(succeeded(), 'refs/heads/master')
     inputs:
       gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
@@ -118,7 +118,7 @@ jobs:
       changeLogType: 'commitBased'
 
   - task: GitHubRelease@1
-    condition: and(succeeded(), 'refs/heads/master'))
+    condition: and(succeeded(), 'refs/heads/master')
     inputs:
       gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
@@ -131,7 +131,7 @@ jobs:
       changeLogType: 'commitBased'
 
   - task: GitHubRelease@1
-    condition: and(succeeded(), 'refs/heads/develop'))
+    condition: and(succeeded(), 'refs/heads/develop')
     inputs:
       gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
