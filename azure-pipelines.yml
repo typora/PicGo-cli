@@ -65,7 +65,7 @@ jobs:
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(name).zip'
       replaceExistingArchive: true
   
-  - script: echo "$($(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version)" >> $(Build.ArtifactStagingDirectory)/version
+  - script: $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version >> $(Build.ArtifactStagingDirectory)/version
 
   - task: PublishBuildArtifacts@1
     inputs:
@@ -81,11 +81,6 @@ jobs:
       $(cmdPrefix) echo "check version"
       $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'check result'
-  
-  - task: CmdLine@2  # this step generates the output variable
-    name: GetVersion
-    inputs:
-      script: echo "##vso[task.setvariable variable=PICGO_VERSION;]'$($(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version)'"
 
 - job: Release
   dependsOn: BaseBuild
@@ -106,7 +101,7 @@ jobs:
     displayName: 'check result'
 
   - task: GitHubRelease@1
-    condition: and(succeeded(), 'refs/heads/master')
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
     name: GitHubReleaseForMasterLatest
     inputs:
       gitHubConnection: 'github.com_abnerlee'
@@ -119,11 +114,13 @@ jobs:
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'
 
-  - script: echo "$picgoVersion"
+  - script: |
+      echo "$(picgoVersion)"
+      echo "$version"
 
   - task: GitHubRelease@1
     name: GitHubReleaseForDevelopLatest
-    condition: and(succeeded(), 'refs/heads/develop')
+    condition: and(succeeded(),  eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
     inputs:
       gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
