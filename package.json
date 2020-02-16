@@ -1,19 +1,24 @@
 {
   "name": "picgo-cli",
-  "version": "1.3.7",
+  "version": "1.4.4",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "pkg-win64": "nexe index.js --output bin/win64/picgo.exe --target {platform: 'win', arch: 'x64'} --rc {CompanyName: 'PicGo'}",
-    "pkg-win32": "nexe index.js --output bin/win32/picgo.exe --target {platform: 'win', arch: 'ia32'} --rc {CompanyName: 'PicGo'}",
-    "pkg-mac": "nexe index.js --output bin/mac/picgo --target {platform: 'mac'}",
-    "pkg-linux": "nexe index.js --output bin/linux/picgo --target {platform: 'linux', arch: 'x64'}"
+    "build-mac": "node ./mac/compile.js",
+    "pkg": " pkg index.js --targets win --output bin/win/picgo.exe --assets node_modules/**/* --debug",
+    "nexe-win64": "nexe index.js --output bin/win64/picgo.exe --target {platform: 'win', arch: 'x64'} --rc {CompanyName: 'PicGo'}",
+    "nexe-win32": "nexe index.js --output bin/win32/picgo.exe --target {platform: 'win', arch: 'ia32'} --rc {CompanyName: 'PicGo'}",
+    "nexe-mac": "nexe index.js --output bin/mac/picgo --target {platform: 'mac'}",
+    "nexe-linux": "nexe index.js --output bin/linux/picgo --target {platform: 'linux', arch: 'x64'}"
   },
   "author": "",
   "license": "MIT",
   "dependencies": {
     "minimist": "^1.2.0",
-    "picgo": "^1.3.7"
+    "picgo": "^1.4.4"
+  },
+  "pkg": {
+    "assets": "node_modules/**/*"
   }
 }

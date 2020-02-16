@@ -1,0 +1,1 @@
+codesign --force --sign Developer ../bin/mac/picgo

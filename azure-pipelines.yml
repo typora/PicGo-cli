@@ -5,6 +5,7 @@
 
 trigger:
 - master
+- develop
 
 jobs:
 - job: BaseBuild
@@ -14,16 +15,31 @@ jobs:
       linux:
         name: 'linux'
         arch: 'x64'
-        imageName: 'ubuntu-16.04'
-      mac:
-        name: 'mac'
-        arch: 'x64'
-        imageName: 'macos-10.13'
-        extension: '.exe'
+        imageName: 'ubuntu-18.04'
+        extension: ''
+        cmdPrefix: ''
+        target: 'linux-x64'
+      #mac:
+      #  name: 'mac'
+      #  arch: 'x64'
+      #  imageName: 'macos-10.13'
+      #  extension: ''
+      #  cmdPrefix: ''
+      #  target: 'mac'
       win64:
-        name: 'win64'
-        arch: 'x64'
-        imageName: 'vs2017-win2016'
+         name: 'win64'
+         arch: 'x64'
+         imageName: 'vs2017-win2016'
+         extension: '.exe'
+         cmdPrefix: 'CALL'
+         target: 'windows-x64'
+      win32:
+         name: 'win32'
+         arch: 'x86'
+         imageName: 'vs2017-win2016'
+         extension: '.exe'
+         cmdPrefix: 'CALL'
+         target: 'windows-x86'
 
   pool:
     vmImage: $(imageName)
@@ -31,14 +47,20 @@ jobs:
   steps:
   - task: UseNode@1
     inputs:
-      version: '12.x'
+      version: '12.13.0'
 
   - script: |
-      yarn add nexe -D 
-      yarn install
-    displayName: 'prepare'
-
-  - script: nexe index.js --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      $(cmdPrefix) rm -rf node_modules
+      $(cmdPrefix) rm -rf ~/.nexe
+      $(cmdPrefix) rm -rf $(Build.BinariesDirectory)/bin/$(name)
+      $(cmdPrefix) npm install --production
+      $(cmdPrefix) npm install nexe@next --global
+      $(cmdPrefix) nexe --clean /dev/null 2>&1
+      $(cmdPrefix) nexe index.js --target $(target) --resource "node_modules/**/*" --temp $(Agent.TempDirectory) --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+      echo -----test result------
+      $(cmdPrefix) ls -lh $(Build.BinariesDirectory)/bin/$(name)
+      $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
     displayName: 'package'
 
   - task: ArchiveFiles@2
@@ -48,16 +70,153 @@ jobs:
       archiveType: 'zip'
       archiveFile: '$(Build.ArtifactStagingDirectory)/$(name).zip'
       replaceExistingArchive: true
+  
+  - script: $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version >> $(Build.ArtifactStagingDirectory)/version
+
+  - task: PublishBuildArtifacts@1
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'picgo-cli'
+      publishLocation: 'Container'
+
+  - script: |
+      $(cmdPrefix) echo "ls System.ArtifactsDirectory"
+      $(cmdPrefix) ls -a $(System.ArtifactsDirectory)
+      $(cmdPrefix) echo "ls System.ArtifactStagingDirectory"
+      $(cmdPrefix) ls -a $(Build.ArtifactStagingDirectory)
+      $(cmdPrefix) echo "check version"
+      $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+    displayName: 'check result'
+
+## Build and codesign macOS binaries
+#- job: MacBuild
+
+#  variables:
+#    name: 'mac'
+#    arch: 'x64'
+#    imageName: 'macos-10.13'
+#    extension: ''
+#    cmdPrefix: ''
+#    target: 'mac'
+
+#  pool:
+#    vmImage: 'macos-10.13'
+
+#  steps:
+#  - task: UseNode@1
+#    inputs:
+#      version: '12.x'
+
+#  - task: CmdLine@2
+#    env:
+#      binFolder: $(Build.BinariesDirectory)
+#    inputs:
+#      script: |
+#        npm install --production
+#        npm install nexe@next --global
+#        npm link nexe@next
+#        npm run build-mac
+#        chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
+#        echo -----test result------
+#        ls -lh $(Build.BinariesDirectory)/bin/$(name)
+#        $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+#    displayName: 'package'
+  
+#  - task: InstallAppleCertificate@2
+#    inputs:
+#      certSecureFile: 'picgo.p12'
+#      certPwd: '$(p12-password)'
+#      keychain: 'temp'
+  
+#  - script: |
+#      codesign --force --sign Developer $(Build.BinariesDirectory)/bin/mac/picgo
+  
+#  - task: ArchiveFiles@2
+#    inputs:
+#      rootFolderOrFile: '$(Build.BinariesDirectory)/bin/$(name)/'
+#      includeRootFolder: true
+#      archiveType: 'zip'
+#      archiveFile: '$(Build.ArtifactStagingDirectory)/$(name).zip'
+#      replaceExistingArchive: true
+  
+#  - script: $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version >> $(Build.ArtifactStagingDirectory)/version
+
+#  - task: PublishBuildArtifacts@1
+#    inputs:
+#      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#      ArtifactName: 'picgo-cli'
+#      publishLocation: 'Container'
+
+#  - script: |
+#      $(cmdPrefix) echo "ls System.ArtifactsDirectory"
+#      $(cmdPrefix) ls -a $(System.ArtifactsDirectory)
+#      $(cmdPrefix) echo "ls System.ArtifactStagingDirectory"
+#      $(cmdPrefix) ls -a $(Build.ArtifactStagingDirectory)
+#      $(cmdPrefix) echo "check version"
+#      $(cmdPrefix) $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension) --version
+#    displayName: 'check result'
+
 
 - job: Release
-  dependsOn: BaseBuild
+  dependsOn: 
+    - BaseBuild
+    #- MacBuild
 
   steps:
-  - task: GitHubRelease@1
+  - task: DownloadBuildArtifacts@0
     inputs:
+      buildType: 'current'
+      downloadType: 'specific'
+      downloadPath: '$(System.ArtifactsDirectory)'
+
+  - script: |
+      ls -a $(System.ArtifactsDirectory)
+      echo '----'
+      ls -a $(System.ArtifactsDirectory)/picgo-cli
+      version=$(cat $(System.ArtifactsDirectory)/picgo-cli/version)
+      echo "version is $version"
+      echo "##vso[task.setvariable variable=picgo.version;]$version"
+      echo "picgo.version is $PICGO_VERSION"
+    displayName: 'check result'
+
+  - task: GitHubRelease@1
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    name: GitHubReleaseForMasterLatest
+    inputs:
+      gitHubConnection: 'github.com_abnerlee'
       repositoryName: '$(Build.Repository.Name)'
-      action: 'create'
+      action: 'edit'
       target: '$(Build.SourceVersion)'
-      tagSource: 'gitTag'
+      tag: 'latest'
+      assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
+      assetUploadMode: 'replace'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
+
+  - task: GitHubRelease@1
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    name: GitHubReleaseForVersion
+    inputs:
+      gitHubConnection: 'github.com_abnerlee'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'edit'
+      target: '$(Build.SourceVersion)'
+      tag: '$(picgo.version)'
+      assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
+      assetUploadMode: 'replace'
+      changeLogCompareToRelease: 'lastFullRelease'
+      changeLogType: 'commitBased'
+
+  - task: GitHubRelease@1
+    name: GitHubReleaseForDevelopLatest
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    inputs:
+      gitHubConnection: 'github.com_abnerlee'
+      repositoryName: '$(Build.Repository.Name)'
+      action: 'edit'
+      target: '$(Build.SourceVersion)'
+      tag: 'latest-develop'
+      assets: '$(Build.ArtifactStagingDirectory)/picgo-cli/*'
+      assetUploadMode: 'replace'
       changeLogCompareToRelease: 'lastFullRelease'
       changeLogType: 'commitBased'

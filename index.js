@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 const path = require('path')
 const minimist = require('minimist')
+const PicGo = require('picgo')
+
 let argv = minimist(process.argv.slice(2))
 let configPath = argv.c || argv.config || ''
 if (configPath !== true && configPath !== '') {
@@ -8,7 +10,6 @@ if (configPath !== true && configPath !== '') {
 } else {
   configPath = ''
 }
-const PicGo = require('picgo')
 const picgo = new PicGo(configPath)
 picgo.registerCommands()
 
