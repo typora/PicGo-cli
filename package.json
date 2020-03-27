@@ -1,6 +1,6 @@
 {
   "name": "picgo-cli",
-  "version": "1.4.4",
+  "version": "1.4.7",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -15,8 +15,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "minimist": "^1.2.0",
-    "picgo": "^1.4.4"
+    "minimist": "^1.2.2",
+    "picgo": "^1.4.7"
   },
   "pkg": {
     "assets": "node_modules/**/*"
