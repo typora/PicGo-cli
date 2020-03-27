@@ -15,7 +15,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "minimist": "^1.2.0",
+    "minimist": "^1.2.2",
     "picgo": "^1.4.4"
   },
   "pkg": {
