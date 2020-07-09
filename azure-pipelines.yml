@@ -54,7 +54,7 @@ jobs:
       $(cmdPrefix) rm -rf ~/.nexe
       $(cmdPrefix) rm -rf $(Build.BinariesDirectory)/bin/$(name)
       $(cmdPrefix) npm install --production
-      $(cmdPrefix) npm install nexe@4.0.0-beta.6 --global
+      $(cmdPrefix) npm install nexe@4.0.0-beta.8 --global
       $(cmdPrefix) nexe --clean /dev/null 2>&1
       $(cmdPrefix) nexe index.js --target $(target) --resource "node_modules/**/*" --temp $(Agent.TempDirectory) --output $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
       $(cmdPrefix) chmod +x $(Build.BinariesDirectory)/bin/$(name)/picgo$(extension)
